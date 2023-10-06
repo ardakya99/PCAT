@@ -10,7 +10,10 @@ const photoController = require('./controllers/photoContoroller');
 const pageController = require('./controllers/pagesController');
 
 // connect DB
-mongoose.connect('mongodb://127.0.0.1:27017/pcat-test-db');
+mongoose.connect('mongodb+srv://herakles402:Aa123456yhnarda@cluster0.ewbhpub.mongodb.net/pcat-db?retryWrites=true&w=majority')
+.then(() => {
+  console.log("db connected!")
+});
 
 //MIDDLEWARE
 app.use(express.static('public'));
@@ -46,7 +49,7 @@ app.get('/photos/edit/:id', pageController.getEditPage);
 
 
 
-const port = 3000;
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`Sunucu ${port} portuda başlatıldı..`);
 });
