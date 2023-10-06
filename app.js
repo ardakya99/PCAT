@@ -1,53 +1,48 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const fileUpload = require('express-fileupload');
+var methodOverride = require('method-override');
 const ejs = require('ejs');
-const Photo = require('./models/Photo');
-
 const app = express();
+
+//Controller
+const photoController = require('./controllers/photoContoroller');
+const pageController = require('./controllers/pagesController');
 
 // connect DB
 mongoose.connect('mongodb://127.0.0.1:27017/pcat-test-db');
 
 //MIDDLEWARE
 app.use(express.static('public'));
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(fileUpload());
+app.use(
+  methodOverride('_method', {
+    methods: ['POST', 'GET'],
+  })
+);
 
 //TEMPLATE ENGINE
 app.set('view engine', 'ejs');
 
 //ROUTES
 
-app.get('/', async (req, res) => {
-  const photos = await Photo.find({});
-  res.render('index', {
-    photos
-  });
-});
+app.get('/', photoController.getAllPhotos);
 
-app.get('/photos/:id', async (req, res) => {
-  //res.render('photos');
-  // console.log(req.params.id);
-  const photo = await Photo.findById(req.params.id);
-  res.render('photo',{
-    photo
-  })
-});
-
-app.get('/about', (req, res) => {
-  res.render('about');
-});
-app.get('/add', (req, res) => {
-  res.render('add');
-});
+app.get('/photos/:id', photoController.getPhoto);
 
 //FORM POST REQUEST
-app.post('/photos', async (req, res) => {
-  await Photo.create(req.body);
-  res.redirect('/');
-});
+app.post('/photos', photoController.createPhoto);
+
+app.put('/photos/:id', photoController.updatePhoto);
+app.delete('/photos/:id', photoController.deletePhoto);
 
 
+app.get('/about', pageController.getAboutPage);
+app.get('/add', pageController.getAddPage); 
+
+app.get('/photos/edit/:id', pageController.getEditPage);
 
 
 
